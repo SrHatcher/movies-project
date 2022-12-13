@@ -1,4 +1,13 @@
-const API = (endpoint) => `https://api.themoviedb.org/3/${endpoint}`
+const fetchData = axios.create({
+    baseURL: 'https://api.themoviedb.org/3/',  
+    headers: {
+        'Content-Type': 'application/json;charset=utf-8'
+    },
+    params: {
+        'api_key': API_KEY
+    }
+})
+
 const API_Configuration = `https://api.themoviedb.org/3/configuration?api_key=${API_KEY}`
 const API_IMAGE = (posterPath) => `http://image.tmdb.org/t/p/w154/${posterPath}`
 
@@ -9,8 +18,7 @@ async function getConfigurationData(){
 }
 
 async function getTrendingMoviesPreview(){
-    const res = await fetch(API(`trending/movie/day?api_key=${API_KEY}`))
-    const data = await res.json()
+    const {data} = await fetchData(`trending/movie/day`)
 
     const movies = data.results
     console.log(movies);
@@ -30,8 +38,7 @@ async function getTrendingMoviesPreview(){
 }
 
 async function getGenresPreview(){
-    const res = await fetch(API(`genre/movie/list?api_key=${API_KEY}`))
-    const data = await res.json()
+    const {data} = await fetchData(`genre/movie/list`)
 
     const categories = data.genres
     categories.forEach(category => {
@@ -52,5 +59,3 @@ async function getGenresPreview(){
 }
 
 getConfigurationData()
-getTrendingMoviesPreview()
-getGenresPreview()

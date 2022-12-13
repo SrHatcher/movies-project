@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <section id="section">
+        <ul id="ul">
+            <li id="li">
+                <section id="section2">
+                    <ul id="ul2">
+                        <li id="li2">
+                            adios
+                        </li>
+                    </ul>
+                </section>
+            </li>
+        </ul>
+    </section>
+
+    <script>
+        const sec = document.getElementById('section')
+        const ul = document.getElementById('ul')
+        const li = document.getElementById('li')
+
+        const sec2 = document.getElementById('section2')
+        const ul2 = document.getElementById('ul2')
+        const li2 = document.getElementById('li2')
+
+        sec.addEventListener('click', ()=>{console.log('soy el section')}, true)
+        ul.addEventListener('click', ()=>{console.log('soy el ul')}, true)
+        li.addEventListener('click', (e)=>{console.log('soy el li')}, true)
+
+        sec2.addEventListener('click', ()=>{console.log('soy el section2')}, true)
+        ul2.addEventListener('click', ()=>{console.log('soy el ul2')}, true)
+        li2.addEventListener('click', (e)=>{console.log('soy el li2')}, true)
+    </script>
+</body>
+</html>
