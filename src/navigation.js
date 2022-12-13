@@ -1,11 +1,28 @@
 searchFormBTN.addEventListener('click', ()=>{
-    location.hash = 'search'
+    if(location.hash.startsWith('#search=')){
+        if(location.hash.endsWith('#search=')){
+            location.hash = `search=${searchFormInput.value}` 
+        }else{
+            location.hash = location.hash + ',' + searchFormInput.value
+        }
+    }else{
+        location.hash = `search=${searchFormInput.value}`
+    }
+    
 })
 trendingBTN.addEventListener('click', ()=>{
     location.hash = 'trends'
 })
 arrowBTN.addEventListener('click', ()=>{
-    location.hash = 'home'
+    const [hash, history] = location.hash.split('=')
+    const historyList = history.split(',')
+    if(historyList.length > 1){
+        historyList.pop()
+        const newHistoryList = historyList.join(',')
+        location.hash = `${hash}=${newHistoryList}`
+    }else{
+        location.hash = 'home'
+    }
 })
 window.addEventListener('DOMContentLoaded', navigator, false)
 window.addEventListener('hashchange', navigator,false)
@@ -51,13 +68,17 @@ function searchPage(){
     arrowBTN.classList.remove('inactive')
     arrowBTN.classList.remove('header-arrow--white')
     headerTitle.classList.add('inactive')
-    headerCategoryTitle.classList.remove('inactive')
+    headerCategoryTitle.classList.add('inactive')
     searchForm.classList.remove('inactive')
 
     trendingPreviewSection.classList.add('inactive')
     categoriesPreviewSection.classList.add('inactive')
     genericSection.classList.remove('inactive')
     movieDetailSection.classList.add('inactive')
+
+    const [_, query]= location.hash.split('=')
+    const searchs = query.split(',')
+    getMoviesBySearch(searchs.at(-1))
 }
 
 function trendsPage(){
@@ -109,4 +130,8 @@ function categoryPage(){
     categoriesPreviewSection.classList.add('inactive')
     genericSection.classList.remove('inactive')
     movieDetailSection.classList.add('inactive')
+
+    const [_, categoryData]= location.hash.split('=')
+    const [categoryID, categoryName]= categoryData.split('-')
+    getMoviesByCategory(categoryID, categoryName)
 }
