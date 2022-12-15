@@ -25,6 +25,10 @@ function fillMovies(movies, node){
         movieImg.setAttribute('alt', movie.title)
         movieImg.setAttribute('src', API_IMAGE(movie.poster_path))
         movieContainer.appendChild(movieImg)
+        movieContainer.addEventListener('click', ()=>{
+            location.hash = 'movie=' + movie.id
+        })
+
         node.appendChild(movieContainer)
     });
 }
@@ -42,6 +46,13 @@ async function getTrendingMoviesPreview(){
     const movies = data.results
 
     fillMovies(movies, trendingMoviesPreviewList)
+}
+
+async function getTrendingMovies(){
+    const {data} = await fetchData(`trending/movie/day`)
+    const movies = data.results
+
+    fillMovies(movies, genericSection)
 }
 
 async function getGenresPreview(){
@@ -92,4 +103,40 @@ async function getMoviesBySearch(query){
         const movies = data.results
         fillMovies(movies, genericSection)
     }
+}
+
+async function getmovieById(id){
+    const { data: movie }= await fetchData(`movie/${id}`)
+    
+    movieDetailTitle.textContent = movie.title
+    movieDEtailDescription.textContent = movie.overview
+    movieDetailScore.textContent = movie.vote_average
+
+    const movieImgUrl = 'http://image.tmdb.org/t/p/w500/' + movie.poster_path
+    headerSection.style.background = `linear-gradient(180deg, rgba(0, 0, 0, 0.35) 19.27%, rgba(0, 0, 0, 0) 29.17%) ,url(${movieImgUrl})`
+
+    categoriesMovieDetailList.innerHTML = ''
+    console.log(movie)
+    movie.genres.forEach(genre => {
+        const genreContainer = document.createElement('div')
+        const genreTitle = document.createElement('h3')
+
+        genreContainer.classList.add('category-container')
+        genreTitle.classList.add('category-title')
+        genreTitle.setAttribute('id', `id${genre.id}`)
+        genreTitle.innerText = genre.name
+
+        genreContainer.appendChild(genreTitle)
+        categoriesMovieDetailList.appendChild(genreContainer)
+    })
+
+    getRelatedMoviesById(id)
+}
+
+async function getRelatedMoviesById(id){
+    const { data } = await fetchData(`movie/${id}/similar`)
+    const relatedMovies = data.results
+
+    fillMovies(relatedMovies, relatedMoviesContainer)
+    relatedMoviesContainer.scrollTo(0,0)
 }

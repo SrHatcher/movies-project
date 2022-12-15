@@ -1,30 +1,21 @@
 searchFormBTN.addEventListener('click', ()=>{
-    if(location.hash.startsWith('#search=')){
-        if(location.hash.endsWith('#search=')){
-            location.hash = `search=${searchFormInput.value}` 
-        }else{
-            location.hash = location.hash + ',' + searchFormInput.value
-        }
-    }else{
-        location.hash = `search=${searchFormInput.value}`
-    }
-    
+    location.hash = `search=${searchFormInput.value.trim()}` 
 })
 trendingBTN.addEventListener('click', ()=>{
     location.hash = 'trends'
 })
 arrowBTN.addEventListener('click', ()=>{
-    const [hash, history] = location.hash.split('=')
-    const historyList = history.split(',')
-    if(historyList.length > 1){
-        historyList.pop()
-        const newHistoryList = historyList.join(',')
-        location.hash = `${hash}=${newHistoryList}`
+    const stateLoad = window.history.state ? window.history.state.loadUrl : ''
+    if(stateLoad.includes('#')){
+        window.location.hash='home'
     }else{
-        location.hash = 'home'
+        location.hash= window.history.back()
     }
 })
-window.addEventListener('DOMContentLoaded', navigator, false)
+window.addEventListener('DOMContentLoaded', ()=>{
+    navigator()
+    window.history.pushState({loadUrl: window.location.href}, null, '')
+}, false)
 window.addEventListener('hashchange', navigator,false)
 
 function navigator(){
@@ -77,8 +68,7 @@ function searchPage(){
     movieDetailSection.classList.add('inactive')
 
     const [_, query]= location.hash.split('=')
-    const searchs = query.split(',')
-    getMoviesBySearch(searchs.at(-1))
+    getMoviesBySearch(query)
 }
 
 function trendsPage(){
@@ -90,12 +80,15 @@ function trendsPage(){
     arrowBTN.classList.remove('header-arrow--white')
     headerTitle.classList.add('inactive')
     headerCategoryTitle.classList.remove('inactive')
+    headerCategoryTitle.innerHTML='Tendencias'
     searchForm.classList.add('inactive')
 
     trendingPreviewSection.classList.add('inactive')
     categoriesPreviewSection.classList.add('inactive')
     genericSection.classList.remove('inactive')
     movieDetailSection.classList.add('inactive')
+
+    getTrendingMovies()
 }
 
 function moviePage(){
@@ -113,6 +106,9 @@ function moviePage(){
     categoriesPreviewSection.classList.add('inactive')
     genericSection.classList.add('inactive')
     movieDetailSection.classList.remove('inactive')
+
+    const [_, movieId]= location.hash.split('=')
+    getmovieById(movieId)
 }
 
 function categoryPage(){
