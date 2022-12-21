@@ -14,21 +14,42 @@ const API_IMAGE = (posterPath) => `http://image.tmdb.org/t/p/w154/${posterPath}`
 getConfigurationData()
 //utils
 
-function fillMovies(movies, node){
-    node.innerHTML = ''
+const lazyLoader = new IntersectionObserver((entries)=>{
+    entries.forEach((entry)=>{
+        if(entry.isIntersecting){
+            const url=entry.target.getAttribute('data-img')
+            entry.target.setAttribute('src', url)
+            lazyLoader.unobserve(entry.target)
+        }
+    })
+})
+
+function fillMovies(movies, node, {lazyLoad = false, clean = true}){
+    if(clean){
+        node.innerHTML = ''
+    }
+    
     movies.forEach(movie => {
         const movieContainer = document.createElement('div')
         movieContainer.classList.add('movie-container')
-        
+
         const movieImg = document.createElement('img')
+
         movieImg.classList.add('movie-img')
         movieImg.setAttribute('alt', movie.title)
-        movieImg.setAttribute('src', API_IMAGE(movie.poster_path))
+        movieImg.setAttribute(lazyLoad ? 'data-img' : 'src', API_IMAGE(movie.poster_path))
         movieContainer.appendChild(movieImg)
         movieContainer.addEventListener('click', ()=>{
             location.hash = 'movie=' + movie.id
         })
 
+        if(lazyLoad){
+            lazyLoader.observe(movieImg)
+        }
+
+        movieImg.addEventListener('error', ()=>{
+            movieImg.setAttribute('src', 'https://static.platzi.com/static/images/error/img404.png')
+        })
         node.appendChild(movieContainer)
     });
 }
@@ -41,18 +62,46 @@ async function getConfigurationData(){
     console.log(data);
 }
 
+
+
+async function getPaginatedMovies(){
+    const  {scrollTop, scrollHeight, clientHeight} = document.documentElement
+    const isScrollBottom = (scrollTop + clientHeight) >= (scrollHeight - 200)
+
+    if(isScrollBottom){
+        page++
+        const {data} = await fetchData(`trending/movie/day`, {
+            params: {
+                page
+            }
+        })
+        const movies = data.results
+        fillMovies(movies, genericSection, {lazyLoad: true, clean: false})
+    }
+}
+
 async function getTrendingMoviesPreview(){
     const {data} = await fetchData(`trending/movie/day`)
     const movies = data.results
 
-    fillMovies(movies, trendingMoviesPreviewList)
+    fillMovies(movies, trendingMoviesPreviewList, {lazyLoad: true})
 }
 
+
 async function getTrendingMovies(){
+    
+
     const {data} = await fetchData(`trending/movie/day`)
     const movies = data.results
 
-    fillMovies(movies, genericSection)
+    fillMovies(movies, genericSection, {lazyLoad: true, clean: true})    
+    // const btnLoadMore = document.createElement('button')
+    // btnLoadMore.innerText = 'cargar mas'
+    // genericSection.appendChild(btnLoadMore)
+    // btnLoadMore.addEventListener('click', ()=>{
+    //     getTrendingMovies(page + 1, false) 
+    //     btnLoadMore.remove()
+    // })
 }
 
 async function getGenresPreview(){
@@ -88,7 +137,7 @@ async function getMoviesByCategory(id, categoryName){
     
     headerCategoryTitle.innerHTML = categoryName
     const movies = data.results
-    fillMovies(movies, genericSection)
+    fillMovies(movies, genericSection , {lazyLoad: true})
     
 }
 
@@ -116,7 +165,6 @@ async function getmovieById(id){
     headerSection.style.background = `linear-gradient(180deg, rgba(0, 0, 0, 0.35) 19.27%, rgba(0, 0, 0, 0) 29.17%) ,url(${movieImgUrl})`
 
     categoriesMovieDetailList.innerHTML = ''
-    console.log(movie)
     movie.genres.forEach(genre => {
         const genreContainer = document.createElement('div')
         const genreTitle = document.createElement('h3')
@@ -137,6 +185,7 @@ async function getRelatedMoviesById(id){
     const { data } = await fetchData(`movie/${id}/similar`)
     const relatedMovies = data.results
 
-    fillMovies(relatedMovies, relatedMoviesContainer)
+    fillMovies(relatedMovies, relatedMoviesContainer, {lazyLoad: true, clean: true})
     relatedMoviesContainer.scrollTo(0,0)
 }
+

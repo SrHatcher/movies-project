@@ -1,3 +1,7 @@
+let page = 1
+let infiniteScroll
+window.addEventListener('scroll', infiniteScroll, {passive:false})
+
 searchFormBTN.addEventListener('click', ()=>{
     location.hash = `search=${searchFormInput.value.trim()}` 
 })
@@ -19,6 +23,10 @@ window.addEventListener('DOMContentLoaded', ()=>{
 window.addEventListener('hashchange', navigator,false)
 
 function navigator(){
+    if(infiniteScroll){
+        window.removeEventListener('scroll', infiniteScroll, {passive: false})
+        infiniteScroll = undefined
+    }
     if(location.hash.startsWith('#trends')){
         trendsPage()
     }else if(location.hash.startsWith('#search')){
@@ -29,6 +37,10 @@ function navigator(){
         categoryPage()
     }else{
         homePage()
+    }
+
+    if(infiniteScroll){
+        window.addEventListener('scroll', infiniteScroll, {passive: false})
     }
 }
 
@@ -89,6 +101,7 @@ function trendsPage(){
     movieDetailSection.classList.add('inactive')
 
     getTrendingMovies()
+    infiniteScroll = getPaginatedMovies
 }
 
 function moviePage(){
