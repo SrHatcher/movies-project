@@ -24,7 +24,7 @@ const lazyLoader = new IntersectionObserver((entries)=>{
     })
 })
 
-function fillMovies(movies, node, {lazyLoad = false, clean = true}){
+function fillMovies(movies, node, {lazyLoad = false, clean = true} = {}){
     if(clean){
         node.innerHTML = ''
     }
@@ -51,6 +51,16 @@ function fillMovies(movies, node, {lazyLoad = false, clean = true}){
             movieImg.setAttribute('src', 'https://static.platzi.com/static/images/error/img404.png')
         })
         node.appendChild(movieContainer)
+
+        const movieBTN = document.createElement('button')
+        movieBTN.classList.add('movie-btn')
+        movieBTN.addEventListener('click', (event)=>{
+            movieBTN.classList.toggle('movie-btn--liked')
+            event.stopPropagation()
+            //TODO: agregar pelicula a localstorage
+        })
+
+        movieContainer.appendChild(movieBTN)
     });
 }
 
@@ -64,17 +74,19 @@ async function getConfigurationData(){
 
 
 
-async function getPaginatedMovies(){
+async function getPaginatedMoviesForTrending(){
     const  {scrollTop, scrollHeight, clientHeight} = document.documentElement
     const isScrollBottom = (scrollTop + clientHeight) >= (scrollHeight - 200)
+    const pageIsNotMax = page < maxPage
 
-    if(isScrollBottom){
+    if(isScrollBottom && pageIsNotMax){
         page++
         const {data} = await fetchData(`trending/movie/day`, {
             params: {
                 page
             }
         })
+        maxPage = data.total_pages
         const movies = data.results
         fillMovies(movies, genericSection, {lazyLoad: true, clean: false})
     }
@@ -93,15 +105,9 @@ async function getTrendingMovies(){
 
     const {data} = await fetchData(`trending/movie/day`)
     const movies = data.results
+    maxPage = data.total_pages
 
     fillMovies(movies, genericSection, {lazyLoad: true, clean: true})    
-    // const btnLoadMore = document.createElement('button')
-    // btnLoadMore.innerText = 'cargar mas'
-    // genericSection.appendChild(btnLoadMore)
-    // btnLoadMore.addEventListener('click', ()=>{
-    //     getTrendingMovies(page + 1, false) 
-    //     btnLoadMore.remove()
-    // })
 }
 
 async function getGenresPreview(){
@@ -136,21 +142,65 @@ async function getMoviesByCategory(id, categoryName){
     })
     
     headerCategoryTitle.innerHTML = categoryName
+    //console.log(data);
     const movies = data.results
     fillMovies(movies, genericSection , {lazyLoad: true})
     
 }
 
+function getPaginatedMoviesForCategory(id){
+    return async function (){
+        const  {scrollTop, scrollHeight, clientHeight} = document.documentElement
+        const isScrollBottom = (scrollTop + clientHeight) >= (scrollHeight - 50)
+        const pageIsNotMax = page < maxPage
+
+        if(isScrollBottom && pageIsNotMax){
+            page++
+            const {data} = await fetchData(`discover/movie`, {
+                params: {
+                    with_genres: id,
+                    page
+                }
+        })
+        maxPage = data.total_pages
+        const movies = data.results
+        fillMovies(movies, genericSection, {lazyLoad: true, clean: false})
+    }
+    }
+}
+
 async function getMoviesBySearch(query){
-    console.log(query)
     if(!(query.trim().length < 1)){
         const {data} = await fetchData(`search/movie`, {
             params: {
                 query
             }
         })
+        console.log(data);
+        maxPage = data.total_pages
         const movies = data.results
         fillMovies(movies, genericSection)
+    }
+}
+
+function getPaginatedMoviesForSearch(query){
+    return async function (){
+        const  {scrollTop, scrollHeight, clientHeight} = document.documentElement
+        const isScrollBottom = (scrollTop + clientHeight) >= (scrollHeight - 50)
+        const pageIsNotMax = page < maxPage
+
+        if(isScrollBottom && pageIsNotMax){
+            page++
+            const {data} = await fetchData(`search/movie`, {
+                params: {
+                    query,
+                    page
+                }
+        })
+        console.log(data);
+        const movies = data.results
+        fillMovies(movies, genericSection, {lazyLoad: true, clean: false})
+    }
     }
 }
 

@@ -1,4 +1,5 @@
 let page = 1
+let maxPage
 let infiniteScroll
 window.addEventListener('scroll', infiniteScroll, {passive:false})
 
@@ -41,6 +42,7 @@ function navigator(){
 
     if(infiniteScroll){
         window.addEventListener('scroll', infiniteScroll, {passive: false})
+        page = 1
     }
 }
 
@@ -81,6 +83,7 @@ function searchPage(){
 
     const [_, query]= location.hash.split('=')
     getMoviesBySearch(query)
+    infiniteScroll = getPaginatedMoviesForSearch(query)
 }
 
 function trendsPage(){
@@ -143,4 +146,6 @@ function categoryPage(){
     const [_, categoryData]= location.hash.split('=')
     const [categoryID, categoryName]= categoryData.split('-')
     getMoviesByCategory(categoryID, categoryName)
+
+    infiniteScroll = getPaginatedMoviesForCategory(categoryID)
 }

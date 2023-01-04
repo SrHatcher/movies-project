@@ -103,10 +103,36 @@ button {
 
 .movie-container {
   cursor: pointer;
+  position: relative;
 }
 
 .movie-img {
   border-radius: 8px;
+}
+
+.movie-btn{
+  position: absolute;
+  top: 5px;
+  right: 10px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  padding: 0;
+  margin: 0;
+}
+.movie-btn::before{
+  content: '🤍';
+  font-size: 18px;
+}
+
+.movie-btn--liked{
+  background-color: var(--purple-light-2);
+  box-shadow: 0px 0px 10px 2px var(--purple-dark-1);
+}
+
+.movie-btn--liked::before{
+  content: '💜';
+  font-size: 18px;
 }
 
 .categoriesPreview-list, .categories-list {
@@ -400,4 +426,34 @@ footer {
   height: 25px;
   background: var(--purple-light-2);
   animation: loading-skeleton infinite 1.5s;
+}
+
+.liked-header{
+  margin-left: 15px;
+  margin-top: 30px;
+}
+
+.liked-movieList {
+  display:  flex;
+  overflow-x: scroll;
+  overflow-y: hidden;
+  white-space: nowrap;
+  height: 256px;
+  padding-left: 24px;
+  padding-bottom: 16px;
+  padding-top: 16px;
+}
+
+.liked-movieList .movie-container {
+  display: inline-block;
+  margin-right: 8px
+}
+
+.liked-movieList .movie-container .movie-img {
+  height: 225px;
+  min-height: 225px;
+  max-height: 225px;
+  width: 150px;
+  min-width: 150px;
+  max-width: 150px;
 }
