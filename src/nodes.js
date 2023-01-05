@@ -12,6 +12,8 @@ const categoriesPreviewList = document.querySelector('.categoriesPreview-list')
 const movieDetailCategoryList = document.querySelector('#movieDetail .categories-list')
 const relatedMoviesContainer = document.querySelector('.relatedMovies-scrollContainer')
 const categoriesMovieDetailList = document.querySelector('#movieDetail .categories-list')
+const likedMoviesListArticle = document.querySelector('#liked .liked-movieList')
+const likedSection = document.querySelector('#liked')
 
 //Elements
 const headerTitle = document.querySelector('.header-title')

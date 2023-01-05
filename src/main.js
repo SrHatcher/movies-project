@@ -1,3 +1,5 @@
+window.addEventListener('storage', ()=>{console.log('hubo un cambio en local storage')})
+
 const fetchData = axios.create({
     baseURL: 'https://api.themoviedb.org/3/',  
     headers: {
@@ -7,6 +9,32 @@ const fetchData = axios.create({
         'api_key': API_KEY
     }
 })
+
+function likedMoviesList(){
+    const item = localStorage.getItem('liked_movies')
+    let movies
+    if(item){
+        movies= JSON.parse(item)
+    }else{
+        movies={}
+    }
+    return movies
+}
+
+function likeMovie(movie){
+    const likedMovies = likedMoviesList()
+
+    if(likedMovies[movie.id]){
+        console.log('la pelicula ya esta en localstorage');
+        delete likedMovies[movie.id]
+        const datosString = JSON.stringify(likedMovies)
+        localStorage.setItem('liked_movies', datosString)
+    }else{
+        likedMovies[movie.id] = movie
+        const datosString = JSON.stringify(likedMovies)
+        localStorage.setItem('liked_movies', datosString)
+    }
+}
 
 const API_Configuration = `https://api.themoviedb.org/3/configuration?api_key=${API_KEY}`
 const API_IMAGE = (posterPath) => `http://image.tmdb.org/t/p/w154/${posterPath}`
@@ -53,11 +81,17 @@ function fillMovies(movies, node, {lazyLoad = false, clean = true} = {}){
         node.appendChild(movieContainer)
 
         const movieBTN = document.createElement('button')
+        const likedMovies = JSON.parse(localStorage.getItem('liked_movies'))
+        if(likedMovies[movie.id]){
+            movieBTN.classList.add('movie-btn--liked')
+        }
         movieBTN.classList.add('movie-btn')
         movieBTN.addEventListener('click', (event)=>{
             movieBTN.classList.toggle('movie-btn--liked')
             event.stopPropagation()
-            //TODO: agregar pelicula a localstorage
+            likeMovie(movie)
+            getLikedMovies()
+            getTrendingMoviesPreview()
         })
 
         movieContainer.appendChild(movieBTN)
@@ -239,3 +273,10 @@ async function getRelatedMoviesById(id){
     relatedMoviesContainer.scrollTo(0,0)
 }
 
+function getLikedMovies(){
+    const likedMovies = likedMoviesList()
+    const moviesArray=Object.values(likedMovies)
+
+    fillMovies(moviesArray, likedMoviesListArticle, {lazyLoad: true, clean: true, })
+    console.log(likedMovies);
+}

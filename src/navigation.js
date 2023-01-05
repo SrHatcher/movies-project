@@ -3,6 +3,8 @@ let maxPage
 let infiniteScroll
 window.addEventListener('scroll', infiniteScroll, {passive:false})
 
+
+
 searchFormBTN.addEventListener('click', ()=>{
     location.hash = `search=${searchFormInput.value.trim()}` 
 })
@@ -55,6 +57,7 @@ function homePage(){
     headerTitle.classList.remove('inactive')
     headerCategoryTitle.classList.add('inactive')
     searchForm.classList.remove('inactive')
+    likedSection.classList.remove('inactive')
 
     trendingPreviewSection.classList.remove('inactive')
     categoriesPreviewSection.classList.remove('inactive')
@@ -63,6 +66,7 @@ function homePage(){
 
     getTrendingMoviesPreview()
     getGenresPreview()
+    getLikedMovies()
 }
 
 function searchPage(){
@@ -76,6 +80,7 @@ function searchPage(){
     headerCategoryTitle.classList.add('inactive')
     searchForm.classList.remove('inactive')
 
+    likedSection.classList.add('inactive')
     trendingPreviewSection.classList.add('inactive')
     categoriesPreviewSection.classList.add('inactive')
     genericSection.classList.remove('inactive')
@@ -98,6 +103,7 @@ function trendsPage(){
     headerCategoryTitle.innerHTML='Tendencias'
     searchForm.classList.add('inactive')
 
+    likedSection.classList.add('inactive')
     trendingPreviewSection.classList.add('inactive')
     categoriesPreviewSection.classList.add('inactive')
     genericSection.classList.remove('inactive')
@@ -117,11 +123,13 @@ function moviePage(){
     headerTitle.classList.add('inactive')
     headerCategoryTitle.classList.add('inactive')
     searchForm.classList.add('inactive')
+    likedSection.classList.add('inactive')
 
     trendingPreviewSection.classList.add('inactive')
     categoriesPreviewSection.classList.add('inactive')
     genericSection.classList.add('inactive')
     movieDetailSection.classList.remove('inactive')
+
 
     const [_, movieId]= location.hash.split('=')
     getmovieById(movieId)
@@ -138,6 +146,7 @@ function categoryPage(){
     headerCategoryTitle.classList.remove('inactive')
     searchForm.classList.add('inactive')
 
+    likedSection.classList.add('inactive')
     trendingPreviewSection.classList.add('inactive')
     categoriesPreviewSection.classList.add('inactive')
     genericSection.classList.remove('inactive')
